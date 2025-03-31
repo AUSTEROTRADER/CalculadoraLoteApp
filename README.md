@@ -1,1 +1,1 @@
-# CalculadoraLoteApp
+calculadora-lote.index.html
