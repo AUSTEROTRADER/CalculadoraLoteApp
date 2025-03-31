@@ -1,1 +1,1 @@
-calculadora-lote.index.html
+index.html
