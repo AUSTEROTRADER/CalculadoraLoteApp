@@ -7,6 +7,7 @@
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#007acc">
   <style>
+    /* Estilos gerais */
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
@@ -18,6 +19,7 @@
       align-items: center;
       justify-content: flex-start;
       min-height: 100vh;
+      transition: background-color 0.3s, color 0.3s;
     }
     .container {
       background: #ffffff;
@@ -39,7 +41,7 @@
       margin: 10px 0 5px;
       font-weight: bold;
     }
-    input {
+    input, select {
       padding: 10px;
       width: 100%;
       border: 1px solid #ccc;
@@ -55,14 +57,57 @@
       border-radius: 8px;
       font-size: 1em;
     }
+    .theme-toggle {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #007acc;
+      color: #fff;
+      border: none;
+      padding: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    body.dark-mode {
+      background: linear-gradient(145deg, #2c2c2c, #3a3a3a);
+      color: #f1f1f1;
+    }
+    body.dark-mode .container {
+      background: #424242;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+    body.dark-mode h1 {
+      color: #80d8ff;
+    }
+    body.dark-mode input, body.dark-mode select {
+      background: #616161;
+      border: 1px solid #757575;
+      color: #f1f1f1;
+    }
+    body.dark-mode .resultado {
+      background: #37474f;
+      border: 1px solid #455a64;
+    }
+    body.dark-mode .theme-toggle {
+      background: #80d8ff;
+      color: #000;
+    }
   </style>
 </head>
 <body>
+  <button class="theme-toggle" onclick="toggleTheme()">Alternar Tema</button>
   <div class="container">
     <h1>Calculadora de Lote</h1>
 
-    <label for="capital">Capital disponível (US$):</label>
+    <label for="capital">Capital disponível:</label>
     <input type="number" id="capital" value="600">
+
+    <label for="moeda">Moeda:</label>
+    <select id="moeda">
+      <option value="USD">USD</option>
+      <option value="BRL">BRL</option>
+      <option value="BTC">BTC</option>
+    </select>
 
     <label for="risco">Risco por trade (%):</label>
     <input type="number" id="risco" value="1" step="0.1">
@@ -77,18 +122,31 @@
 
   <script>
     const capitalInput = document.getElementById('capital');
+    const moedaSelect = document.getElementById('moeda');
     const riscoInput = document.getElementById('risco');
     const slInput = document.getElementById('sl');
     const resultadoDiv = document.getElementById('resultado');
 
-    function calcularLote() {
+    async function obterTaxasCambio() {
+      // Simulação de taxas de câmbio
+      return {
+        USD: 1,
+        BRL: 0.18, // 1 BRL = 0.18 USD
+        BTC: 50000 // 1 BTC = 50000 USD
+      };
+    }
+
+    async function calcularLote() {
       const capital = parseFloat(capitalInput.value);
+      const moeda = moedaSelect.value;
       const riscoPercent = parseFloat(riscoInput.value);
       const slPips = parseFloat(slInput.value);
 
       if (!capital || !riscoPercent || !slPips) return;
 
-      const riscoUSD = (capital * riscoPercent) / 100;
+      const taxas = await obterTaxasCambio();
+      const capitalEmUSD = capital * taxas[moeda];
+      const riscoUSD = (capitalEmUSD * riscoPercent) / 100;
       const loteIdeal = riscoUSD / (slPips * 10); // 10 USD por pip no lote padrão
 
       resultadoDiv.innerHTML = `
@@ -96,20 +154,15 @@
         Risco por trade: <strong>US$ ${riscoUSD.toFixed(2)}</strong><br>
         Lote ideal: <strong>${loteIdeal.toFixed(3)} lotes</strong>
       `;
+
+      // Salvar configurações no localStorage
+      localStorage.setItem('capital', capital);
+      localStorage.setItem('moeda', moeda);
+      localStorage.setItem('risco', riscoPercent);
+      localStorage.setItem('sl', slPips);
     }
 
     capitalInput.addEventListener('input', calcularLote);
-    riscoInput.addEventListener('input', calcularLote);
-    slInput.addEventListener('input', calcularLote);
-
-    // Service worker para transformar em PWA
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js').then(() => {
-        console.log('Service Worker registrado com sucesso!');
-      }).catch(error => {
-        console.log('Erro ao registrar o Service Worker:', error);
-      });
-    }
-  </script>
-</body>
-</html>
+    moedaSelect.addEventListener('change', calcularLote);
+    riscoInput.addEventListener('input', calcularL
+::contentReference[oaicite:9]{index=9}
